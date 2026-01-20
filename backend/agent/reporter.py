@@ -2,6 +2,7 @@ import json
 import os
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
+from reportlab.lib.utils import ImageReader
 
 # ---------------- JSON REPORT ----------------
 def generate_report(results, logs=[]):
@@ -65,14 +66,39 @@ def generate_pdf_report(report):
 
     c.setFont("Helvetica", 11)
     for step in report["steps"]:
-        if y < 60:
+        # Check if we need a new page for text
+        if y < 50:
             c.showPage()
             y = height - 40
             c.setFont("Helvetica", 11)
 
         line = f"Step {step['step_no']}: {step['action']} → {step['target']} | {step['status']}"
         c.drawString(40, y, line)
-        y -= 15
+        y -= 20
+
+        # Embed Screenshot if available
+        if "screenshot" in step and step["screenshot"]:
+            screenshot_path = os.path.join(REPORT_DIR, "screenshots", step["screenshot"])
+            if os.path.exists(screenshot_path):
+                try:
+                    img = ImageReader(screenshot_path)
+                    img_width, img_height = img.getSize()
+                    aspect = img_height / float(img_width)
+                    
+                    # Scale image to fit nicely
+                    display_width = 400
+                    display_height = display_width * aspect
+                    
+                    # Check if image fits on page
+                    if y - display_height < 50:
+                        c.showPage()
+                        y = height - 40
+                        c.setFont("Helvetica", 11)
+                    
+                    c.drawImage(img, 60, y - display_height, width=display_width, height=display_height)
+                    y -= (display_height + 30) # Space after image
+                except Exception as e:
+                    print(f"Error adding image to PDF: {e}")
 
     c.save()
     return pdf_path

@@ -6,6 +6,7 @@ import os
 # Add backend to sys.path to resolve utils import
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils.dom_mapper import find_element
+from utils.healing import heal_element
 
 def run_test(steps):
     results = []
@@ -14,6 +15,21 @@ def run_test(steps):
     def log(message):
         print(message)
         logs.append(message)
+
+    # Setup screenshots directory
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    SCREENSHOTS_DIR = os.path.join(BASE_DIR, "reports", "screenshots")
+    os.makedirs(SCREENSHOTS_DIR, exist_ok=True)
+
+    def take_screenshot(page, step_no, status):
+        filename = f"step_{step_no}_{status}_{int(time.time())}.png"
+        path = os.path.join(SCREENSHOTS_DIR, filename)
+        try:
+            page.screenshot(path=path)
+            return filename
+        except Exception as e:
+            log(f"Failed to take screenshot: {e}")
+            return None
 
     try:
         with sync_playwright() as p:
@@ -48,9 +64,14 @@ def run_test(steps):
 
                             # Handle Google consent if present
                             try:
-                                accept_btn = find_element(page, "Accept all", timeout=2000)
-                                if accept_btn:
-                                    accept_btn.click()
+                                # Common consent button labels
+                                for btn_label in ["Accept all", "Accept", "Agree", "I agree", "Consent"]:
+                                    accept_btn = find_element(page, btn_label, timeout=1000)
+                                    if accept_btn and accept_btn.is_visible():
+                                        log(f"Dismissing cookie banner: {btn_label}")
+                                        accept_btn.click()
+                                        page.wait_for_load_state("networkidle", timeout=2000)
+                                        break
                             except:
                                 pass
 
@@ -58,10 +79,81 @@ def run_test(steps):
                                 "step_no": idx + 1,
                                 "action": "OPEN",
                                 "target": step["value"],
-                                "status": "PASS"
+                                "status": "PASS",
+                                "screenshot": take_screenshot(page, idx + 1, "PASS")
                             })
                             success = True
                             break
+
+                        elif step["type"] == "click":
+                             log(f"Executing CLICK: {step['value']}")
+                             candidate = None
+                             try:
+                                candidate = find_element(page, step['value'])
+                             except:
+                                pass # Proceed to healing
+                                
+                             if not candidate:
+                                 # 🏥 SELF-HEALING 🏥
+                                 log(f"Element '{step['value']}' not found. Attempting Self-Healing...")
+                                 candidate = heal_element(page, step['value'])
+                                 if candidate:
+                                     log(f"Self-Healing SUCCESS: Found substitute element.")
+                             
+                             if candidate:
+                                 try:
+                                     # Force click to bypass overlay checks
+                                     candidate.click(force=True, timeout=5000)
+                                     log("Click successful.")
+                                 except Exception as e:
+                                     log(f"Click failed: {e}")
+                                     raise e
+                                 
+                                 page.wait_for_load_state("domcontentloaded")
+                                 results.append({
+                                    "step_no": idx + 1,
+                                    "action": "CLICK",
+                                    "target": step["value"],
+                                    "status": "PASS",
+                                    "screenshot": take_screenshot(page, idx + 1, "PASS")
+                                })
+                                 success = True
+                                 break
+                             else:
+                                 raise Exception(f"Could not find element to click: {step['value']}")
+
+                        # ---------------- TYPE ----------------
+                        elif step["type"] == "type":
+                             target_name = step['target']
+                             text_val = step['value']
+                             log(f"Executing TYPE: '{text_val}' into '{target_name}'")
+                             
+                             candidate = find_element(page, target_name)
+                             if not candidate:
+                                 # 🏥 SELF-HEALING 🏥
+                                 log(f"Element '{target_name}' not found. Attempting Self-Healing...")
+                                 candidate = heal_element(page, target_name)
+                             
+                             if candidate:
+                                 try:
+                                     candidate.click(force=True) # Focus
+                                     candidate.fill(text_val)
+                                     log("Type successful.")
+                                 except Exception as e:
+                                     log(f"Type failed: {e}")
+                                     raise e
+
+                                 results.append({
+                                    "step_no": idx + 1,
+                                    "action": "TYPE",
+                                    "target": target_name,
+                                    "status": "PASS",
+                                    "screenshot": take_screenshot(page, idx + 1, "PASS")
+                                })
+                                 success = True
+                                 break
+                             else:
+                                 raise Exception(f"Could not find element to type into: {target_name}")
 
                         # ---------------- SEARCH ----------------
                         elif step["type"] == "search":
@@ -123,7 +215,8 @@ def run_test(steps):
                                 "step_no": idx + 1,
                                 "action": "SEARCH",
                                 "target": step["value"],
-                                "status": "PASS"
+                                "status": "PASS",
+                                "screenshot": take_screenshot(page, idx + 1, "PASS")
                             })
                             success = True
                             break
@@ -140,7 +233,8 @@ def run_test(steps):
                                     "step_no": idx + 1,
                                     "action": "VERIFY",
                                     "target": current_url,
-                                    "status": "PASS"
+                                    "status": "PASS",
+                                    "screenshot": take_screenshot(page, idx + 1, "PASS")
                                 })
                             else:
                                 log(f"Verification FAILED. Content '{step['value']}' not found.")
@@ -149,7 +243,8 @@ def run_test(steps):
                                     "action": "VERIFY",
                                     "target": current_url,
                                     "status": "FAIL",
-                                    "error": f"Content '{step['value']}' not found in URL or Page Title"
+                                    "error": f"Content '{step['value']}' not found in URL or Page Title",
+                                    "screenshot": take_screenshot(page, idx + 1, "FAIL")
                                 })
                             success = True
                             break
@@ -166,7 +261,8 @@ def run_test(steps):
                         "action": step["type"].upper(),
                         "target": step.get("value", ""),
                         "status": "FAIL",
-                        "error": str(last_error)
+                        "error": str(last_error),
+                        "screenshot": take_screenshot(page, idx + 1, "FAIL")
                     })
 
             browser.close()

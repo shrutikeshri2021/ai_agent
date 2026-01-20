@@ -4,19 +4,24 @@ def find_element(page: Page, selector: str, timeout: int = 5000) -> Locator:
     """
     Tries to find an element using multiple strategies to handle dynamic IDs or changes.
     """
-    # Create variations of casing (Original, Lowercase, Titlecase)
-    variations = {selector, selector.lower(), selector.title()}
+    # Prioritize original casing, then Title, then lower
+    variations = [selector]
+    if selector.title() != selector: variations.append(selector.title())
+    if selector.lower() != selector: variations.append(selector.lower())
     
     strategies = []
     for s in variations:
         strategies.extend([
+            f"[placeholder='{s}']",                 # Placeholder (High priority for inputs)
             f"[aria-label='{s}']",                  # Aria Label
-            f"[placeholder='{s}']",                 # Placeholder
+            f"input[name='{s}']",                   # Input Name
+            f"input[id='{s}']",                     # Input ID
             f"button:has-text('{s}')",              # Button text
             f"a:has-text('{s}')",                   # Link text
-            f"text={s}",                            # Text content
+            f"input[value='{s}']",                  # Input Value
             f"[title='{s}']",                       # Title attribute
             f"[data-testid='{s}']",                 # Test ID
+            f"text={s}",                            # Text content (Low priority)
              # Basic IDs if valid CSS 
             f"#{s}" if " " not in s else None, 
         ])
@@ -32,21 +37,22 @@ def find_element(page: Page, selector: str, timeout: int = 5000) -> Locator:
     # Add generic fallbacks at the end
     cleaned_strategies.append(selector)
 
+    best_candidate = None
+
     for strategy in cleaned_strategies:
         try:
-            element = page.locator(strategy).first
-            if element.count() > 0:  
-                # If we found something, try to ensure it's actionable
-                try:
-                    element.wait_for(state="attached", timeout=500)
-                    if element.is_visible():
-                        return element
-                except:
-                    pass
-                # Even if not visible, we return it as best guess if it's attached
-                return element
+            # Get all matches for this strategy
+            locs = page.locator(strategy).all()
+            
+            for loc in locs:
+                if loc.is_visible():
+                    return loc # Found a visible match! Best case.
+                
+                # Keep the first finding as a fallback
+                if best_candidate is None:
+                    best_candidate = loc
         except Exception:
             continue
             
-    # Fallback: If no strategy works, return None so the caller can use a generic fallback
-    return None
+    # Fallback: If no visible element found, return the first invisible one we found
+    return best_candidate

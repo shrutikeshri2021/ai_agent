@@ -210,131 +210,199 @@ textarea[aria-label="Logs"] {
 st.title("🚀 AI Agent Web Tester")
 st.markdown("Automate your web testing with natural language instructions.")
 
-col1, col2 = st.columns([2, 1])
+# Tabs for Run and History
+tab1, tab2 = st.tabs(["▶️ Run Test", "📜 History"])
 
-if "report" not in st.session_state:
-    st.session_state.report = None
+with tab1:
+    col1, col2 = st.columns([2, 1])
 
-with col1:
-    instruction = st.text_area(
-        "📝 Test Scenario",
-        placeholder="1. Open youtube.com\n2. Search for Python Tutorials\n3. Verify the results page loads",
-        height=150,
-        help="Enter each step on a new line."
-    )
-
-with col2:
-    st.write("### ⚙️ Controls")
-    if st.button("▶️ Run Test", type="primary", use_container_width=True):
-        if not instruction:
-            st.warning("Please enter test steps.")
-        else:
-            st.session_state.pdf_file = None
-            st.session_state.json_file = None
-
-            with st.spinner("🤖 Agent is executing test..."):
-                try:
-                    res = requests.post(
-                        "http://127.0.0.1:5000/run",
-                        json={"instruction": instruction},
-                        timeout=120
-                    )
-
-                    if res.status_code == 200:
-                        st.session_state.report = res.json()
-                        st.balloons()
-                    else:
-                        st.error("Backend error")
-                        st.text(res.text)
-
-                except requests.exceptions.ConnectionError:
-                    st.error("Backend crashed or browser blocked the test")
-
-    if st.button("🗑️ Clear Results", use_container_width=True):
+    if "report" not in st.session_state:
         st.session_state.report = None
-        st.rerun()
-
-# ================= RESULTS =================
-if st.session_state.report:
-    st.divider()
-    summary = st.session_state.report["summary"]
-
-    st.subheader("📊 Execution Summary")
-    m1, m2, m3, m4 = st.columns(4)
-    m1.metric("Total Steps", summary["total_steps"])
-    m2.metric("Passed", summary["passed"])
-    m3.metric("Failed", summary["failed"])
-    m4.metric("Success Rate", f"{summary['pass_percentage']}%")
-
-    st.progress(summary['pass_percentage'] / 100)
-
-    st.subheader("🧪 Step Execution")
-    for step in st.session_state.report["steps"]:
-        status = step["status"]
-        badge_class = "badge-pass" if status == "PASS" else "badge-fail"
-
-        error_html = ""
-        if "error" in step and step["error"]:
-            error_html = f'<div class="error-text">⚠️ {step["error"]}</div>'
-
-        st.markdown(f"""
-        <div class="step-card">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span class="step-title">Step {step['step_no']}: {step['action']}</span>
-                <span class="badge {badge_class}">{status}</span>
-            </div>
-            <div style="margin-top:8px;">
-                Target: <span class="step-target">{step['target']}</span>
-            </div>
-            {error_html}
-        </div>
-        """, unsafe_allow_html=True)
-
-    st.subheader("📜 Playwright Logs")
-    st.text_area("Logs", "\n".join(st.session_state.report.get("logs", [])), height=200)
-
-    st.subheader("📄 JSON Report")
-    st.json(st.session_state.report)
-
-st.subheader("📥 Download Report")
-d1, d2 = st.columns(2)
-
-if "json_file" not in st.session_state:
-    st.session_state.json_file = None
-
-with d2:
-    if st.button("🧾 Generate JSON", use_container_width=True):
-        response = requests.get("http://127.0.0.1:5000/download/json")
-        if response.status_code == 200:
-            st.session_state.json_file = response.content
-        else:
-            st.error("Failed to fetch JSON report")
-
-    if st.session_state.json_file:
-        st.download_button(
-            label="⬇️ Download JSON",
-            data=st.session_state.json_file,
-            file_name="test_report.json",
-            mime="application/json",
-            use_container_width=True
+    
+    with col1:
+        instruction = st.text_area(
+            "📝 Test Scenario",
+            placeholder="1. Open youtube.com\n2. Search for Python Tutorials\n3. Verify the results page loads",
+            height=150,
+            help="Enter each step on a new line."
         )
 
-if "pdf_file" not in st.session_state:
-    st.session_state.pdf_file = None
+    with col2:
+        st.write("### ⚙️ Controls")
+        if st.button("▶️ Run Test", type="primary", use_container_width=True):
+            if not instruction:
+                st.warning("Please enter test steps.")
+            else:
+                st.session_state.pdf_file = None
+                st.session_state.json_file = None
 
-with d1:
-    if st.button("📄 Generate PDF", use_container_width=True):
-        response = requests.get("http://127.0.0.1:5000/download/pdf")
-        if response.status_code == 200:
-            st.session_state.pdf_file = response.content
+                with st.spinner("🤖 Agent is executing test..."):
+                    try:
+                        res = requests.post(
+                            "http://127.0.0.1:5000/run",
+                            json={"instruction": instruction},
+                            timeout=120
+                        )
+
+                        if res.status_code == 200:
+                            st.session_state.report = res.json()
+                            st.balloons()
+                        else:
+                            st.error("Backend error")
+                            st.text(res.text)
+
+                    except requests.exceptions.ConnectionError:
+                        st.error("Backend crashed or browser blocked the test")
+
+        if st.button("🗑️ Clear Results", use_container_width=True):
+            st.session_state.report = None
+            st.rerun()
+
+    # ================= RESULTS =================
+    if st.session_state.report:
+        st.divider()
+        summary = st.session_state.report["summary"]
+
+        st.subheader("📊 Execution Summary")
+        m1, m2, m3, m4 = st.columns(4)
+        m1.metric("Total Steps", summary["total_steps"])
+        m2.metric("Passed", summary["passed"])
+        m3.metric("Failed", summary["failed"])
+        m4.metric("Success Rate", f"{summary['pass_percentage']}%")
+
+        st.progress(summary['pass_percentage'] / 100)
+
+        st.subheader("🧪 Step Execution")
+        for step in st.session_state.report["steps"]:
+            status = step["status"]
+            badge_class = "badge-pass" if status == "PASS" else "badge-fail"
+
+            error_html = ""
+            if "error" in step and step["error"]:
+                error_html = f'<div class="error-text">⚠️ {step["error"]}</div>'
+
+            st.markdown(f"""
+            <div class="step-card">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span class="step-title">Step {step['step_no']}: {step['action']}</span>
+                    <span class="badge {badge_class}">{status}</span>
+                </div>
+                <div style="margin-top:8px;"> 
+                    Target: <span class="step-target">{step['target']}</span>
+                </div>
+                {error_html}
+            </div>
+            """, unsafe_allow_html=True)
+            
+            if step.get("screenshot"):
+                # Fetch image server-side to ensure it loads even if client can't hit backend port directly
+                try:
+                    img_url = f"http://127.0.0.1:5000/screenshots/{step['screenshot']}"
+                    img_resp = requests.get(img_url, timeout=5)
+                    if img_resp.status_code == 200:
+                        st.image(img_resp.content, caption=f"Step {step['step_no']} Screenshot", width=600)
+                    else:
+                        st.warning(f"Screenshot found but failed to load. (Status: {img_resp.status_code})")
+                except Exception as e:
+                    st.warning(f"Could not retrieve screenshot: {e}")
+
+        st.subheader("📜 Playwright Logs")
+        st.text_area("Logs", "\n".join(st.session_state.report.get("logs", [])), height=200)
+
+        st.subheader("📄 JSON Report")
+        st.json(st.session_state.report)
+
+    st.subheader("📥 Download Report")
+    d1, d2 = st.columns(2)
+
+    if "json_file" not in st.session_state:
+        st.session_state.json_file = None
+
+    with d2:
+        if st.button("🧾 Generate JSON", use_container_width=True):
+            response = requests.get("http://127.0.0.1:5000/download/json")
+            if response.status_code == 200:
+                st.session_state.json_file = response.content
+            else:
+                st.error("Failed to fetch JSON report")
+
+        if st.session_state.json_file:
+            st.download_button(
+                label="⬇️ Download JSON",
+                data=st.session_state.json_file,
+                file_name="test_report.json",
+                mime="application/json",
+                use_container_width=True
+            )
+
+    if "pdf_file" not in st.session_state:
+        st.session_state.pdf_file = None
+
+    with d1:
+        if st.button("📄 Generate PDF", use_container_width=True):
+            response = requests.get("http://127.0.0.1:5000/download/pdf")
+            if response.status_code == 200:
+                st.session_state.pdf_file = response.content
+            else:
+                st.error("Failed to fetch PDF report")
+
+        if st.session_state.pdf_file:
+            st.download_button(
+                label="⬇️ Download PDF",
+                data=st.session_state.pdf_file,
+                file_name="test_report.pdf",
+                mime="application/pdf",
+                use_container_width=True
+            )
+
+with tab2:
+    st.subheader("📜 Test Run History")
+    
+    col_h1, col_h2 = st.columns([1, 4])
+    with col_h1:
+        if st.button("🔄 Refresh History"):
+            st.rerun()
+    with col_h2:
+        if st.button("🗑️ Delete All History", type="primary"):
+            try:
+                requests.delete("http://127.0.0.1:5000/history")
+                st.success("History deleted!")
+                st.rerun()
+            except:
+                st.error("Failed to delete history")
+        
+    try:
+        res = requests.get("http://127.0.0.1:5000/history")
+        if res.status_code == 200:
+            history = res.json()
+            if not history:
+                st.info("No test runs found yet.")
+            else:
+                # Calculate Pass Percentage
+                for run in history:
+                    total = run.get("total_steps", 0)
+                    passed = run.get("passed", 0)
+                    if total > 0:
+                        run["pass_percent"] = f"{round((passed / total) * 100, 1)}%"
+                    else:
+                        run["pass_percent"] = "0%"
+
+                st.dataframe(
+                    history, 
+                    column_config={
+                        "timestamp": "Date & Time",
+                        "instruction": "Test Instruction",
+                        "total_steps": "Total Steps",
+                        "passed": "Passed ✅",
+                        "failed": "Failed ❌",
+                        "pass_percent": "Pass % 📈",
+                        "status": st.column_config.TextColumn("Status"),
+                    },
+                    use_container_width=True,
+                    hide_index=True
+                )
         else:
-            st.error("Failed to fetch PDF report")
+            st.error("Failed to fetch history")
+    except Exception as e:
+        st.error(f"Error connecting to backend: {e}")
 
-    if st.session_state.pdf_file:
-        st.download_button(
-            label="⬇️ Download PDF",
-            data=st.session_state.pdf_file,
-            file_name="test_report.pdf",
-            mime="application/pdf",
-            use_container_width=True
-        )

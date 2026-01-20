@@ -1,98 +1,156 @@
-# AI Agent to Test Websites Automatically Using Natural Language
+# 🤖 AI Agent for Automated Website Testing (Enterprise Edition)
 
-## 1. Introduction / Objective
-This project implements an intelligent agent capable of performing automated end-to-end (E2E) testing on web applications. The agent accepts natural language instructions, interprets them, generates Playwright test scripts, executes those scripts in a headless browser, and produces detailed test reports.
+This is an **Advanced AI-Powered Web Automation Agent** designed to execute end-to-end testing using Natural Language Instructions. Unlike traditional testing frameworks that require writing code, this agents listens to simple text commands, executes them on a real browser, and generates professional PDF/JSON reports.
 
-## 2. Methodology / Workflow
-### Instruction Interpretation Phase
-- Accepts user-defined natural language test cases.
-- Parses input and identifies actionable test steps.
+It features **Self-Healing Capabilities**, **Visual Reporting**, and a **Persistent History Database**, making it a robust tool for QA Automation.
 
-### Code Generation Phase
-- Converts interpreted steps into executable Playwright scripts.
-- Dynamically generates assertions to validate expected outcomes.
+---
 
-### Execution Phase
-- Runs Playwright tests in a headless browser environment.
-- Monitors DOM and adapts dynamically to web structure changes.
+## 🚀 Key Features
 
-### Reporting Phase
-- Summarizes results including passed/failed assertions.
-- Generates human-readable test reports for review.
+### 1. 🧠 Smart Automation Engine
+*   **Natural Language Processing**: Parses human-readable commands like `CLICK "Login"` or `TYPE "user" INTO "Username"`.
+*   **Playwright Integration**: Uses Microsoft Playwright for high-speed, reliable browser automation.
 
-## 3. Modules
-- **Instruction Parser Module**: Interprets natural language test descriptions and maps them to browser actions.
-- **Code Generation Module**: Converts parsed actions into executable Playwright Python scripts.
-- **Execution Module**: Runs tests headlessly and captures runtime logs.
-- **Assertion & Reporting Module**: Validates expected results and compiles test summaries.
+### 2. 🏥 Self-Healing AI
+*   **Fuzzy Matching**: If a button text changes slightly (e.g., "Sign In" -> "Log In") or has a dynamic ID, the agent uses `difflib` similarity matching to find the closest element instead of failing.
+*   **Smart Visibility**: Automatically filters out hidden elements to interact only with what the user sees (fixes issues with mobile menus on desktop sites).
 
-## 4. System Design / Architecture
-The architecture integrates LangGraph for agent workflow orchestration and Playwright for browser automation. Each test cycle follows a pipeline of instruction → code generation → execution → reporting.
+### 3. 📊 Comprehensive Reporting
+*   **Screenshot-on-Every-Step**: Captures screenshots for every passed or failed action.
+*   **PDF Test Reports**: Generates a professional PDF containing execution logs and embedded screenshots.
+*   **Frontend Gallery**: View screenshots directly in the Streamlit UI.
 
-## 5. Week-wise Module Implementation and High-Level Requirements
+### 4. 🗄️ Database & History
+*   **SQLite Integration**: Automatically saves every test run into `test_history.db`.
+*   **Analytics Dashboard**: The "History" tab shows detailed metrics:
+    *   Pass/Fail Status
+    *   Execution Time
+    *   Pass Percentage (📈)
+    *   Total Steps
 
-### Milestone 1: Week 1–2 (Environment & Core Setup)
-**Goal**: Set up the foundation, dependencies, and basic server structure.
+---
 
-*   **Execution Detail**:
-    *   Established the Python virtual environment and installed core libraries (`flask`, `playwright`, `langgraph`).
-    *   Created the entry point for the backend server (`app.py`) to handle API requests.
-*   **Files Added**:
-    *   `backend/requirements.txt`: Lists all project dependencies.
-    *   `backend/app.py`: The main Flask application server.
-    *   `backend/agent/__init__.py`: Package initialization.
+## 🛠️ Technology Stack
 
-### Milestone 2: Week 3–4 (Instruction Parsing)
-**Goal**: Build the brain that understands natural language.
+| Component | Technology | Description |
+| :--- | :--- | :--- |
+| **Frontend** | **Streamlit** | Interactive UI for running tests and viewing history. |
+| **Backend** | **Flask** | REST API handling requests, database logic, and file serving. |
+| **Core Engine** | **Playwright (Python)** | Headless browser automation. |
+| **Database** | **SQLite** | Lightweight, file-based database for persistence. |
+| **Report Engine** | **ReportLab** | PDF generation library. |
+| **Self-Healing** | **Difflib** | Python standard library for fuzzy string matching. |
 
-*   **Execution Detail**:
-    *   Implemented `parse_instruction` to take raw text (e.g., "Go to Google") and convert it into structured JSON objects (e.g., `{"type": "goto", "value": "google.com"}`).
-    *   Defined the `run_agent` workflow to orchestrate the flow from input to parsing.
-*   **Files Added**:
-    *   `backend/agent/parser.py`: Contains logic to map text to command types (`goto`, `search`, `verify`).
-    *   `backend/agent/graph.py`: Defines the main agent entry point and orchestration.
+---
 
-### Milestone 3: Week 5–6 (Code Generation & Execution)
-**Goal**: Make the agent act on the web using Playwright.
+## ⚙️ Installation & Setup
 
-*   **Execution Detail**:
-    *   The **Generator** converts the structured JSON steps into Playwright-specific actions.
-    *   The **Executor** uses `sync_playwright` to launch a browser (Chromium), open a context, and execute the steps.
-    *   Implemented intelligent wait mechanisms (`wait_for_load_state`) and interaction logic (clicking, typing).
-*   **Files Added**:
-    *   `backend/agent/generator.py`: *Conceptually handles step pre-processing.*
-    *   `backend/agent/executor.py`: The core engine that runs `page.goto()`, `page.click()`, and `page.fill()`.
+1.  **Clone the Repository**
+    ```bash
+    git clone <repo-url>
+    cd ai-agent-testing
+    ```
 
-### Milestone 4: Week 7–8 (Reporting & UI Finalization)
-**Goal**: Polish the user experience and generate tangible results.
+2.  **Install Dependencies**
+    ```bash
+    pip install -r backend/requirements.txt
+    pip install streamlit
+    ```
 
-*   **Execution Detail**:
-    *   **Reporting**: Integrated `reportlab` to draw PDF reports and standard `json` libraries to save execution data.
-    *   **DOM Mapping**: Added `dom_mapper.py` to intelligently find elements when standard selectors fail (adaptive execution).
-    *   **Frontend**: Built a vibrant Streamlit interface to input commands, view real-time logs, and download reports.
-*   **Files Added**:
-    *   `backend/agent/reporter.py`: Generates `test_report.pdf` and `test_report.json`.
-    *   `backend/utils/dom_mapper.py`: Helper functions to locate DOM elements reliably.
-    *   `frontend/app.py`: The Streamlit dashboard with Cyberpunk/Neon styling.
-    *   `frontend/ui.css`: Custom CSS for the frontend application.
+3.  **Initialize Playwright Browsers**
+    ```bash
+    playwright install
+    ```
 
-## 6. Technology Stack
-**Programming Language**: Python 3.x
-**Frameworks / Tools**:
-- **LangGraph**: Workflow orchestration.
-- **Playwright (Python)**: Browser automation engine.
-- **Flask**: Backend API server.
-- **Streamlit**: Interactive frontend UI.
-- **ReportLab**: PDF report generation.
+4.  **Run the Application**
+    *   **Step 1: Start Backend** (Terminal 1)
+        ```bash
+        python backend/app.py
+        ```
+    *   **Step 2: Start Frontend** (Terminal 2)
+        ```bash
+        streamlit run frontend/app.py
+        ```
 
-## 7. Additional Features & Enhancements
-Beyond the core milestones, the following advanced features have been implemented to enhance usability and reliability:
+5.  **Access the UI**
+    *   Open [http://localhost:8501](http://localhost:8501) in your browser.
 
-- **Cyberpunk / Neon UI Theme**: A modern, vibrant frontend interface with glassmorphism effects, neon glows, and high-contrast styling for better visual feedback.
-- **Real-Time Execution Logs**: The frontend displays live, detailed logs from the backend agent (e.g., "Executing GOTO", "Found search trigger"), providing transparency into the agent's decision-making process.
-- **Smart Element Detection**: The agent uses adaptive strategies (fallback selectors, intelligent waits) to handle dynamic web elements that might not load immediately or have standard IDs.
-- **Robust Auto-Retry Mechanism**: Test steps automatically retry up to 3 times upon failure to handle network flakiness or slow-loading resources.
-- **Dynamic Report Generation**:
-    - **Live JSON Reports**: Structured data summaries available immediately after test execution.
-    - **PDF Export**: Professional-grade PDF reports with step-by-step pass/fail status and styling.
+---
 
+## 📖 How to Use (Supported Commands)
+
+The agent uses a **Strict Keyword Parser** for reliability. Use the following syntax in the text area:
+
+| Command | Usage | Example |
+| :--- | :--- | :--- |
+| **GOTO** | Opens a website | `GOTO "https://www.google.com"` |
+| **CLICK** | Clicks a button/link | `CLICK "Login"` |
+| **TYPE** | Types text into a specific input | `TYPE "admin" INTO "Username"` |
+| **SEARCH** | Finds the generic search bar & searches | `SEARCH "Laptop"` |
+| **VERIFY** | Checks if text exists on the page | `VERIFY "Welcome User"` |
+
+---
+
+## 🧪 Test Case Examples
+
+### ✅ 1. Passing Scenario (Login Flow)
+*Use this to test the `TYPE` command and Form Filling.*
+```text
+1. GOTO "https://www.saucedemo.com"
+2. TYPE "standard_user" INTO "Username"
+3. TYPE "secret_sauce" INTO "Password"
+4. CLICK "Login"
+5. VERIFY "Products"
+```
+
+### ❌ 2. Failing Scenario (Verification Error)
+*Use this to test Screenshot capturing on Failure.*
+```text
+1. GOTO "https://www.saucedemo.com"
+2. TYPE "locked_out_user" INTO "Username"
+3. TYPE "secret_sauce" INTO "Password"
+4. CLICK "Login"
+5. VERIFY "Welcome"
+```
+*(This fails because the user is locked out, and "Welcome" is not shown.)*
+
+### 🏥 3. Self-Healing Scenario (Fuzzy Match)
+*Use this to test the AI's ability to find buttons even if the text isn't exact.*
+```text
+1. GOTO "https://www.saucedemo.com/inventory.html"
+2. CLICK "Add to cart"  
+```
+*(If the button says "ADD TO CART" (uppercase), the fuzzy matcher will still find it.)*
+
+---
+
+## 📂 Project Structure
+
+```
+/backend
+    /agent
+        executor.py     # Core Playwright Logic (Run Tests)
+        parser.py       # Parses Text -> JSON Instructions
+        generator.py    # Maps JSON -> Playwright Actions
+        reporter.py     # Generates PDF/JSON Reports
+    /utils
+        dom_mapper.py   # Smart Element Selector (Finds visible inputs)
+        healing.py      # AI Self-Healing Logic
+    app.py              # Flask API Entry Point
+    database.py         # SQLite Database Handler
+    requirements.txt    # Python Dependencies
+
+/frontend
+    app.py              # Streamlit UI (History, Runner, Visuals)
+
+/docs
+    api.md              # API Documentation
+```
+
+---
+
+## 🔮 Future Scope
+1.  **Visual Regression**: Compare screenshots against a "Golden Baseline" to detect UI bugs.
+2.  **LLM Integration**: Re-integrate GPT-4 for "Generic Intent" parsing (e.g., "Buy me a milk") instead of strict commands.
+3.  **Cloud Execution**: Run tests in Docker containers or AWS Lambda.

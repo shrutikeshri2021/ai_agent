@@ -1,7 +1,7 @@
 {
     "summary": {
-        "total_steps": 2,
-        "passed": 2,
+        "total_steps": 4,
+        "passed": 4,
         "failed": 0,
         "pass_percentage": 100.0
     },
@@ -9,19 +9,47 @@
         {
             "step_no": 1,
             "action": "OPEN",
-            "target": "https://youtube.com",
-            "status": "PASS"
+            "target": "https://www.amazon.com",
+            "status": "PASS",
+            "screenshot": "step_1_PASS_1768900598.png"
         },
         {
             "step_no": 2,
-            "action": "SEARCH",
-            "target": "python course",
-            "status": "PASS"
+            "action": "TYPE",
+            "target": "Search Amazon",
+            "status": "PASS",
+            "screenshot": "step_2_PASS_1768900603.png"
+        },
+        {
+            "step_no": 3,
+            "action": "CLICK",
+            "target": "Go",
+            "status": "PASS",
+            "screenshot": "step_3_PASS_1768900606.png"
+        },
+        {
+            "step_no": 4,
+            "action": "VERIFY",
+            "target": "https://www.amazon.com/s?k=Gaming+Laptop&crid=251WE5T8YAH9Y&sprefix=gaming+laptop%2Caps%2C729&ref=nb_sb_noss_1",
+            "status": "PASS",
+            "screenshot": "step_4_PASS_1768900606.png"
         }
     ],
     "logs": [
-        "Executing SEARCH: python course",
-        "Found visible search input directly.",
-        "Filling search box..."
+        "Executing GOTO: https://www.amazon.com",
+        "Page loaded: https://www.amazon.com",
+        "Executing TYPE: 'Gaming Laptop' into 'Search Amazon'",
+        "Element 'Search Amazon' not found. Attempting Self-Healing...",
+        "Step 2 attempt 1 failed: Could not find element to type into: Search Amazon",
+        "Executing TYPE: 'Gaming Laptop' into 'Search Amazon'",
+        "Element 'Search Amazon' not found. Attempting Self-Healing...",
+        "Step 2 attempt 2 failed: Could not find element to type into: Search Amazon",
+        "Executing TYPE: 'Gaming Laptop' into 'Search Amazon'",
+        "Type successful.",
+        "Executing CLICK: Go",
+        "Click successful.",
+        "Executing VERIFY: Results",
+        "Checking content in URL: https://www.amazon.com/s?k=Gaming+Laptop&crid=251WE5T8YAH9Y&sprefix=gaming+laptop%2Caps%2C729&ref=nb_sb_noss_1 and Page Title/Content",
+        "Verification SUCCESS found content match."
     ]
 }

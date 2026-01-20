@@ -21,6 +21,18 @@ def generate_playwright_steps(parsed_steps):
         elif step["action"] == "type":
             code_steps.append({"type": "type", "value": step["value"], "target": step["target"]})
             
+        elif step["action"] == "hover":
+            code_steps.append({"type": "hover", "value": step["value"]})
+
+        elif step["action"] == "select":
+            code_steps.append({"type": "select", "value": step["value"], "target": step["target"]})
+
+        elif step["action"] == "wait":
+            code_steps.append({"type": "wait", "value": step["value"]})
+
+        elif step["action"] == "scroll":
+            code_steps.append({"type": "scroll", "value": step["value"]})
+
         elif step["action"] == "verify":
             code_steps.append({"type": "verify", "value": step["value"]})
 

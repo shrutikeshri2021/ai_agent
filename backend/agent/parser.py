@@ -38,6 +38,31 @@ def parse_instruction(text):
             if match:
                 value, target = match.groups()
                 steps.append({"action": "type", "value": value, "target": target})
+
+        elif lower_line.startswith("hover"):
+            # Extract target to hover
+            value = re.sub(r'^hover\s+(over\s+)?', '', line_clean, flags=re.IGNORECASE).strip()
+            value = value.strip('"').strip("'")
+            steps.append({"action": "hover", "value": value})
+
+        elif lower_line.startswith("select"):
+            # Extract option and target: Select "Option" from "Dropdown"
+            match = re.search(r'select\s+["\'](.+?)["\']\s+from\s+["\'](.+?)["\']', line_clean, re.IGNORECASE)
+            if match:
+                value, target = match.groups()
+                steps.append({"action": "select", "value": value, "target": target})
+
+        elif lower_line.startswith("wait"):
+            # Extract seconds: Wait 5 seconds
+            match = re.search(r'wait\s+(\d+)', line_clean, re.IGNORECASE)
+            if match:
+                steps.append({"action": "wait", "value": int(match.group(1))})
+        
+        elif lower_line.startswith("scroll"):
+            # Scroll Down / Up
+            direction = "down"
+            if "up" in lower_line: direction = "up"
+            steps.append({"action": "scroll", "value": direction})
             
         elif any(x in lower_line for x in ["verify", "check", "analyze", "validate"]):
              # Remove the command word

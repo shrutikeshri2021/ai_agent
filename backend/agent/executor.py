@@ -155,6 +155,100 @@ def run_test(steps):
                              else:
                                  raise Exception(f"Could not find element to type into: {target_name}")
 
+                        # ---------------- HOVER ----------------
+                        elif step["type"] == "hover":
+                            log(f"Executing HOVER: {step['value']}")
+                            candidate = find_element(page, step['value'])
+                            if not candidate:
+                                log(f"Element '{step['value']}' not found for hover.")
+                                candidate = heal_element(page, step['value'])
+                            
+                            if candidate:
+                                # Start hovering
+                                candidate.hover(force=True)
+                                
+                                # CRITICAL: Wait and Keep Hovering
+                                # Many menus disappear if the mouse leaves instantly or if JS is slow.
+                                # We deliberately sleep while the mouse is "technically" over the element 
+                                # because Playwright hover is instantaneous.
+                                time.sleep(2) 
+                                
+                                results.append({
+                                    "step_no": idx + 1, "action": "HOVER", "target": step["value"], "status": "PASS",
+                                    "screenshot": take_screenshot(page, idx + 1, "PASS")
+                                })
+                                success = True
+                                break
+                            else:
+                                raise Exception(f"Could not find element to hover: {step['value']}")
+
+                        # ---------------- SELECT (Dropdown) ----------------
+                        elif step["type"] == "select":
+                            target_name = step['target']
+                            option_val = step['value']
+                            log(f"Executing SELECT: '{option_val}' from '{target_name}'")
+                            
+                            # Find the <select> element (or a wrapper)
+                            candidate = find_element(page, target_name)
+                            if not candidate:
+                                candidate = heal_element(page, target_name)
+
+                            if candidate:
+                                # Check if it's a standard <select>
+                                tag = candidate.evaluate("el => el.tagName")
+                                if tag == "SELECT":
+                                    candidate.select_option(label=option_val)
+                                else:
+                                    # Try to find a select inside
+                                    sel = candidate.locator("select").first
+                                    if sel.count() > 0:
+                                        sel.select_option(label=option_val)
+                                    else:
+                                        # Fallback for custom dropdowns (Click dropdown, then click option)
+                                        log("Not a standard <select>, trying click-to-select...")
+                                        candidate.click()
+                                        time.sleep(1)
+                                        opt = find_element(page, option_val)
+                                        if opt: 
+                                            opt.click()
+                                        else:
+                                            raise Exception("Could not find dropdown option")
+
+                                results.append({
+                                    "step_no": idx + 1, "action": "SELECT", "target": f"{option_val} in {target_name}", "status": "PASS",
+                                    "screenshot": take_screenshot(page, idx + 1, "PASS")
+                                })
+                                success = True
+                                break
+                            else:
+                                raise Exception(f"Could not find dropdown: {target_name}")
+
+                        # ---------------- WAIT ----------------
+                        elif step["type"] == "wait":
+                            sec = int(step["value"])
+                            log(f"Executing WAIT: {sec} seconds...")
+                            time.sleep(sec)
+                            results.append({
+                                "step_no": idx + 1, "action": "WAIT", "target": f"{sec}s", "status": "PASS",
+                                "screenshot": None
+                            })
+                            success = True
+                            break
+
+                        # ---------------- SCROLL ----------------
+                        elif step["type"] == "scroll":
+                            direction = step["value"]
+                            log(f"Executing SCROLL: {direction}")
+                            delta = 700 if direction == "down" else -700
+                            page.mouse.wheel(0, delta)
+                            time.sleep(1)
+                            results.append({
+                                "step_no": idx + 1, "action": "SCROLL", "target": direction, "status": "PASS",
+                                "screenshot": take_screenshot(page, idx + 1, "PASS")
+                            })
+                            success = True
+                            break
+
                         # ---------------- SEARCH ----------------
                         elif step["type"] == "search":
                             # Strategy 1: Look for an already visible input field first

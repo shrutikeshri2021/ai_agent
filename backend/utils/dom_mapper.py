@@ -10,18 +10,27 @@ def find_element(page: Page, selector: str, timeout: int = 5000) -> Locator:
     if selector.lower() != selector: variations.append(selector.lower())
     
     strategies = []
+    
+    # 1. STRICT EXACT MATCHES (Highest Priority)
+    # This prevents partial matches (e.g., 'Electronics' matching 'Consumer Electronics Policy')
     for s in variations:
         strategies.extend([
-            f"[placeholder='{s}']",                 # Placeholder (High priority for inputs)
-            f"[aria-label='{s}']",                  # Aria Label
-            f"input[name='{s}']",                   # Input Name
-            f"input[id='{s}']",                     # Input ID
-            f"button:has-text('{s}')",              # Button text
-            f"a:has-text('{s}')",                   # Link text
-            f"input[value='{s}']",                  # Input Value
-            f"[title='{s}']",                       # Title attribute
+            f"text='{s}'",                          # Exact text match (Case-sensitive-ish)
+            f"a:text-is('{s}')",                    # Exact link text
+            f"button:text-is('{s}')",               # Exact button text
+            f"[aria-label='{s}']",                  # Exact Aria
+            f"[placeholder='{s}']",                 # Exact Placeholder
+            f"input[value='{s}']",                  # Exact Input Value
+        ])
+        
+    # 2. LOOSE/SUBSTRING MATCHES (Fallback)
+    for s in variations:
+        strategies.extend([
+            f"button:has-text('{s}')",              # Button containing text
+            f"a:has-text('{s}')",                   # Link containing text
+            f"input[name*='{s}']",                  # Input Name partial
+            f"text={s}",                            # Generic text content (Low priority)
             f"[data-testid='{s}']",                 # Test ID
-            f"text={s}",                            # Text content (Low priority)
              # Basic IDs if valid CSS 
             f"#{s}" if " " not in s else None, 
         ])

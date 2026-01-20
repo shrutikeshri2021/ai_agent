@@ -1,55 +1,77 @@
 {
     "summary": {
-        "total_steps": 4,
-        "passed": 4,
-        "failed": 0,
-        "pass_percentage": 100.0
+        "total_steps": 5,
+        "passed": 3,
+        "failed": 2,
+        "pass_percentage": 60.0
     },
     "steps": [
         {
             "step_no": 1,
             "action": "OPEN",
-            "target": "https://www.amazon.com",
+            "target": "https://www.ebay.com",
             "status": "PASS",
-            "screenshot": "step_1_PASS_1768900598.png"
+            "screenshot": "step_1_PASS_1768903404.png"
         },
         {
             "step_no": 2,
-            "action": "TYPE",
-            "target": "Search Amazon",
+            "action": "HOVER",
+            "target": "Motors",
             "status": "PASS",
-            "screenshot": "step_2_PASS_1768900603.png"
+            "screenshot": "step_2_PASS_1768903414.png"
         },
         {
             "step_no": 3,
-            "action": "CLICK",
-            "target": "Go",
+            "action": "WAIT",
+            "target": "2s",
             "status": "PASS",
-            "screenshot": "step_3_PASS_1768900606.png"
+            "screenshot": null
         },
         {
             "step_no": 4,
+            "action": "CLICK",
+            "target": "Parts & Accessories",
+            "status": "FAIL",
+            "error": "Locator.all: Target page, context or browser has been closed",
+            "screenshot": null
+        },
+        {
+            "step_no": 5,
             "action": "VERIFY",
-            "target": "https://www.amazon.com/s?k=Gaming+Laptop&crid=251WE5T8YAH9Y&sprefix=gaming+laptop%2Caps%2C729&ref=nb_sb_noss_1",
-            "status": "PASS",
-            "screenshot": "step_4_PASS_1768900606.png"
+            "target": "Automotive",
+            "status": "FAIL",
+            "error": "Page.title: Target page, context or browser has been closed",
+            "screenshot": null
         }
     ],
     "logs": [
-        "Executing GOTO: https://www.amazon.com",
-        "Page loaded: https://www.amazon.com",
-        "Executing TYPE: 'Gaming Laptop' into 'Search Amazon'",
-        "Element 'Search Amazon' not found. Attempting Self-Healing...",
-        "Step 2 attempt 1 failed: Could not find element to type into: Search Amazon",
-        "Executing TYPE: 'Gaming Laptop' into 'Search Amazon'",
-        "Element 'Search Amazon' not found. Attempting Self-Healing...",
-        "Step 2 attempt 2 failed: Could not find element to type into: Search Amazon",
-        "Executing TYPE: 'Gaming Laptop' into 'Search Amazon'",
-        "Type successful.",
-        "Executing CLICK: Go",
-        "Click successful.",
-        "Executing VERIFY: Results",
-        "Checking content in URL: https://www.amazon.com/s?k=Gaming+Laptop&crid=251WE5T8YAH9Y&sprefix=gaming+laptop%2Caps%2C729&ref=nb_sb_noss_1 and Page Title/Content",
-        "Verification SUCCESS found content match."
+        "Executing GOTO: https://www.ebay.com",
+        "Page loaded: https://www.ebay.com",
+        "Dismissing cookie banner: Agree",
+        "Executing HOVER: Motors",
+        "Element 'Motors' not found for hover.",
+        "Executing WAIT: 2 seconds...",
+        "Executing CLICK: Parts & Accessories",
+        "Element 'Parts & Accessories' not found. Attempting Self-Healing...",
+        "Step 4 attempt 1 failed: Locator.all: Target page, context or browser has been closed",
+        "Executing CLICK: Parts & Accessories",
+        "Element 'Parts & Accessories' not found. Attempting Self-Healing...",
+        "Step 4 attempt 2 failed: Locator.all: Target page, context or browser has been closed",
+        "Executing CLICK: Parts & Accessories",
+        "Element 'Parts & Accessories' not found. Attempting Self-Healing...",
+        "Step 4 attempt 3 failed: Locator.all: Target page, context or browser has been closed",
+        "Step 4 FAILED after all attempts.",
+        "Failed to take screenshot: Page.screenshot: Target page, context or browser has been closed",
+        "Executing VERIFY: Automotive",
+        "Checking content in URL: https://www.ebayinc.com/stories/press-room/#assets-settlements and Page Title/Content",
+        "Step 5 attempt 1 failed: Page.title: Target page, context or browser has been closed",
+        "Executing VERIFY: Automotive",
+        "Checking content in URL: https://www.ebayinc.com/stories/press-room/#assets-settlements and Page Title/Content",
+        "Step 5 attempt 2 failed: Page.title: Target page, context or browser has been closed",
+        "Executing VERIFY: Automotive",
+        "Checking content in URL: https://www.ebayinc.com/stories/press-room/#assets-settlements and Page Title/Content",
+        "Step 5 attempt 3 failed: Page.title: Target page, context or browser has been closed",
+        "Step 5 FAILED after all attempts.",
+        "Failed to take screenshot: Page.screenshot: Target page, context or browser has been closed"
     ]
 }

@@ -1,5 +1,9 @@
 import streamlit as st
 import requests
+import os
+
+# Get backend URL from environment or default to localhost
+BACKEND_URL = os.environ.get("BACKEND_URL", "http://127.0.0.1:5000")
 
 st.set_page_config(page_title="AI Web Test Agent", layout="wide", page_icon="🤖")
 
@@ -369,14 +373,14 @@ with tab2:
     with col_h2:
         if st.button("🗑️ Delete All History", type="primary"):
             try:
-                requests.delete("http://127.0.0.1:5000/history")
+                requests.delete(f"{BACKEND_URL}/history")
                 st.success("History deleted!")
                 st.rerun()
             except:
                 st.error("Failed to delete history")
         
     try:
-        res = requests.get("http://127.0.0.1:5000/history")
+        res = requests.get(f"{BACKEND_URL}/history")
         if res.status_code == 200:
             history = res.json()
             if not history:
@@ -419,7 +423,6 @@ with tab2:
                             label_visibility="collapsed",
                             key=f"hist_query_{run['id']}"
                         )
-
         else:
             st.error("Failed to fetch history")
     except Exception as e:

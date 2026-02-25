@@ -210,6 +210,10 @@ textarea[aria-label="Logs"] {
 st.title("🚀 AI Agent Web Tester")
 st.markdown("Automate your web testing with natural language instructions.")
 
+# Sidebar for API Key
+st.sidebar.header("🔑 Configuration")
+api_key = st.sidebar.text_input("Groq API Key", type="password", help="Enter Groq Key to use LLM Parsing. (Free & Fast)")
+
 # Tabs for Run and History
 tab1, tab2 = st.tabs(["▶️ Run Test", "📜 History"])
 
@@ -240,7 +244,7 @@ with tab1:
                     try:
                         res = requests.post(
                             "http://127.0.0.1:5000/run",
-                            json={"instruction": instruction},
+                            json={"instruction": instruction, "api_key": api_key},
                             timeout=120
                         )
 
@@ -401,6 +405,21 @@ with tab2:
                     use_container_width=True,
                     hide_index=True
                 )
+                
+                # Show full exact query in expander
+                st.markdown("### 📝 Detailed Instruction Logs")
+                for run in history:
+                    with st.expander(f"Run #{run['id']} - {run['timestamp']} (Status: {run['status']})"):
+                        st.caption("Exact Query Used:")
+                        st.text_area(
+                            label="Query Content", 
+                            value=run['instruction'], 
+                            height=100, 
+                            disabled=True,
+                            label_visibility="collapsed",
+                            key=f"hist_query_{run['id']}"
+                        )
+
         else:
             st.error("Failed to fetch history")
     except Exception as e:

@@ -14,7 +14,10 @@ def home():
 @app.route("/run", methods=["POST"])
 def run_test():
     user_input = request.json.get("instruction")
-    report = run_agent(user_input)
+    api_key = request.json.get("api_key") # Optional
+    
+    report = run_agent(user_input, api_key)
+    
     database.add_test_run(user_input, report)
     return jsonify(report)
 

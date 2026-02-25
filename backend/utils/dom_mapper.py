@@ -9,6 +9,13 @@ def find_element(page: Page, selector: str, timeout: int = 5000) -> Locator:
     if selector.title() != selector: variations.append(selector.title())
     if selector.lower() != selector: variations.append(selector.lower())
     
+    # Pre-cleaning: "Usage-based" synonyms
+    # If user says "Search Box", we should also look for "Search"
+    if "search" in selector.lower():
+        variations.append("Search")
+        variations.append("search")
+        variations.append("q") # Google's specific query param
+
     strategies = []
     
     # 1. STRICT EXACT MATCHES (Highest Priority)
@@ -19,6 +26,8 @@ def find_element(page: Page, selector: str, timeout: int = 5000) -> Locator:
             f"a:text-is('{s}')",                    # Exact link text
             f"button:text-is('{s}')",               # Exact button text
             f"[aria-label='{s}']",                  # Exact Aria
+            f"textarea[aria-label='{s}']",          # Textarea Aria (Google specific catch)
+            f"[title='{s}']",                       # Title attribute (Google 'Search')
             f"[placeholder='{s}']",                 # Exact Placeholder
             f"input[value='{s}']",                  # Exact Input Value
         ])
@@ -28,6 +37,10 @@ def find_element(page: Page, selector: str, timeout: int = 5000) -> Locator:
         strategies.extend([
             f"button:has-text('{s}')",              # Button containing text
             f"a:has-text('{s}')",                   # Link containing text
+            f"input[name='{s}']",                   # Exact Input Name
+            f"textarea[name='{s}']",                # Textarea Name
+            f"[aria-label*='{s}' i]",               # Case-insensitive partial Aria
+            f"[placeholder*='{s}' i]",              # Case-insensitive partial Placeholder
             f"input[name*='{s}']",                  # Input Name partial
             f"text={s}",                            # Generic text content (Low priority)
             f"[data-testid='{s}']",                 # Test ID

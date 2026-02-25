@@ -1,77 +1,42 @@
 {
     "summary": {
-        "total_steps": 5,
-        "passed": 3,
-        "failed": 2,
-        "pass_percentage": 60.0
+        "total_steps": 2,
+        "passed": 1,
+        "failed": 1,
+        "pass_percentage": 50.0
     },
     "steps": [
         {
             "step_no": 1,
             "action": "OPEN",
-            "target": "https://www.ebay.com",
+            "target": "https://google.com",
             "status": "PASS",
-            "screenshot": "step_1_PASS_1768903404.png"
+            "screenshot": "step_1_PASS_1771955092.png"
         },
         {
             "step_no": 2,
-            "action": "HOVER",
-            "target": "Motors",
-            "status": "PASS",
-            "screenshot": "step_2_PASS_1768903414.png"
-        },
-        {
-            "step_no": 3,
-            "action": "WAIT",
-            "target": "2s",
-            "status": "PASS",
-            "screenshot": null
-        },
-        {
-            "step_no": 4,
-            "action": "CLICK",
-            "target": "Parts & Accessories",
+            "action": "SEARCH",
+            "target": "OpenAI",
             "status": "FAIL",
-            "error": "Locator.all: Target page, context or browser has been closed",
-            "screenshot": null
-        },
-        {
-            "step_no": 5,
-            "action": "VERIFY",
-            "target": "Automotive",
-            "status": "FAIL",
-            "error": "Page.title: Target page, context or browser has been closed",
-            "screenshot": null
+            "error": "Locator.fill: Error: Input of type \"submit\" cannot be filled\nCall log:\n  - waiting for locator(\"input[type='text'], input[type='search'], input:not([type='hidden'])\").filter(has=filter(visible=True)).first\n    - locator resolved to <input name=\"btnK\" tabindex=\"0\" role=\"button\" type=\"submit\" class=\"gNO89b\" value=\"Google Search\" aria-label=\"Google Search\" data-ved=\"0ahUKEwih4PeN1_KSAxVFzzgGHY8aGQgQ4dUDCBk\"/>\n    - fill(\"OpenAI\")\n  - attempting fill action\n    - waiting for element to be visible, enabled and editable\n",
+            "screenshot": "step_2_FAIL_1771955099.png"
         }
     ],
     "logs": [
-        "Executing GOTO: https://www.ebay.com",
-        "Page loaded: https://www.ebay.com",
-        "Dismissing cookie banner: Agree",
-        "Executing HOVER: Motors",
-        "Element 'Motors' not found for hover.",
-        "Executing WAIT: 2 seconds...",
-        "Executing CLICK: Parts & Accessories",
-        "Element 'Parts & Accessories' not found. Attempting Self-Healing...",
-        "Step 4 attempt 1 failed: Locator.all: Target page, context or browser has been closed",
-        "Executing CLICK: Parts & Accessories",
-        "Element 'Parts & Accessories' not found. Attempting Self-Healing...",
-        "Step 4 attempt 2 failed: Locator.all: Target page, context or browser has been closed",
-        "Executing CLICK: Parts & Accessories",
-        "Element 'Parts & Accessories' not found. Attempting Self-Healing...",
-        "Step 4 attempt 3 failed: Locator.all: Target page, context or browser has been closed",
-        "Step 4 FAILED after all attempts.",
-        "Failed to take screenshot: Page.screenshot: Target page, context or browser has been closed",
-        "Executing VERIFY: Automotive",
-        "Checking content in URL: https://www.ebayinc.com/stories/press-room/#assets-settlements and Page Title/Content",
-        "Step 5 attempt 1 failed: Page.title: Target page, context or browser has been closed",
-        "Executing VERIFY: Automotive",
-        "Checking content in URL: https://www.ebayinc.com/stories/press-room/#assets-settlements and Page Title/Content",
-        "Step 5 attempt 2 failed: Page.title: Target page, context or browser has been closed",
-        "Executing VERIFY: Automotive",
-        "Checking content in URL: https://www.ebayinc.com/stories/press-room/#assets-settlements and Page Title/Content",
-        "Step 5 attempt 3 failed: Page.title: Target page, context or browser has been closed",
-        "Step 5 FAILED after all attempts.",
-        "Failed to take screenshot: Page.screenshot: Target page, context or browser has been closed"
+        "Executing GOTO: https://google.com",
+        "Page loaded: https://google.com",
+        "Executing SEARCH: OpenAI",
+        "Found visible search input directly.",
+        "Filling search box...",
+        "Step 2 attempt 1 failed: Locator.fill: Error: Input of type \"submit\" cannot be filled\nCall log:\n  - waiting for locator(\"input[type='text'], input[type='search'], input:not([type='hidden'])\").filter(has=filter(visible=True)).first\n    - locator resolved to <input name=\"btnK\" tabindex=\"0\" role=\"button\" type=\"submit\" class=\"gNO89b\" value=\"Google Search\" aria-label=\"Google Search\" data-ved=\"0ahUKEwih4PeN1_KSAxVFzzgGHY8aGQgQ4dUDCBk\"/>\n    - fill(\"OpenAI\")\n  - attempting fill action\n    - waiting for element to be visible, enabled and editable\n",
+        "Executing SEARCH: OpenAI",
+        "Found visible search input directly.",
+        "Filling search box...",
+        "Step 2 attempt 2 failed: Locator.fill: Error: Input of type \"submit\" cannot be filled\nCall log:\n  - waiting for locator(\"input[type='text'], input[type='search'], input:not([type='hidden'])\").filter(has=filter(visible=True)).first\n    - locator resolved to <input name=\"btnK\" tabindex=\"0\" role=\"button\" type=\"submit\" class=\"gNO89b\" value=\"Google Search\" aria-label=\"Google Search\" data-ved=\"0ahUKEwih4PeN1_KSAxVFzzgGHY8aGQgQ4dUDCBk\"/>\n    - fill(\"OpenAI\")\n  - attempting fill action\n    - waiting for element to be visible, enabled and editable\n",
+        "Executing SEARCH: OpenAI",
+        "Found visible search input directly.",
+        "Filling search box...",
+        "Step 2 attempt 3 failed: Locator.fill: Error: Input of type \"submit\" cannot be filled\nCall log:\n  - waiting for locator(\"input[type='text'], input[type='search'], input:not([type='hidden'])\").filter(has=filter(visible=True)).first\n    - locator resolved to <input name=\"btnK\" tabindex=\"0\" role=\"button\" type=\"submit\" class=\"gNO89b\" value=\"Google Search\" aria-label=\"Google Search\" data-ved=\"0ahUKEwih4PeN1_KSAxVFzzgGHY8aGQgQ4dUDCBk\"/>\n    - fill(\"OpenAI\")\n  - attempting fill action\n    - waiting for element to be visible, enabled and editable\n",
+        "Step 2 FAILED after all attempts."
     ]
 }

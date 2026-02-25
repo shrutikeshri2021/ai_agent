@@ -1,6 +1,9 @@
 flask
 playwright
 langchain
+langchain-openai
 langgraph
 pydantic
 reportlab
+streamlit
+langchain-groq

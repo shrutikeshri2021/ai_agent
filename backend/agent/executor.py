@@ -304,6 +304,10 @@ def run_test(steps):
                                 page.wait_for_load_state("domcontentloaded", timeout=10000)
                             except:
                                 pass # Continue even if timeout (e.g. YouTube keeps loading)
+                            
+                            # WAIT FOR RESULTS TO APPEAR
+                            # After searching, we should wait briefly for new content to render
+                            time.sleep(2)
 
                             results.append({
                                 "step_no": idx + 1,
@@ -314,6 +318,73 @@ def run_test(steps):
                             })
                             success = True
                             break
+
+                        # ---------------- PLAY (YouTube/Video) ----------------
+                        elif step["type"] == "play" or (step["type"] == "click" and "play" in step["value"].lower()):
+                            target_video = step["value"]
+                            log(f"Executing PLAY: {target_video}")
+                            
+                            video_element = None
+
+                            # 1. YouTube Specific: Target the main video title Link
+                            if "youtube.com" in page.url:
+                                log("YouTube Context: scanning for video titles...")
+                                # Get all video titles
+                                titles = page.locator("a#video-title")
+                                count = titles.count()
+                                if count > 0:
+                                    # Pick the first visible one that isn't empty
+                                    for i in range(min(5, count)):
+                                        t = titles.nth(i)
+                                        if t.is_visible():
+                                            video_element = t
+                                            log("Found visible YouTube video title.")
+                                            break
+                            
+                            # 2. Spotify Context: Target the specific song/artist play button
+                            if not video_element and "spotify.com" in page.url:
+                                log("Spotify Context: looking for play buttons...")
+                                # Spotify often has green play buttons or list items
+                                # Try finding the specific text first
+                                song_name = target_video.replace("first video", "").replace("play", "").strip()
+                                if song_name:
+                                    video_element = find_element(page, song_name)
+                                
+                                if not video_element:
+                                    # Fallback: Click the big green play button if visible
+                                    video_element = page.locator("[data-testid='play-button']").first
+                            
+                            # 3. Generic Fallback (Text Match)
+                            if not video_element:
+                                if "first" in target_video.lower():
+                                    # Generic strategy for "click the first thing that looks like a video"
+                                    # This is risky but better than failing
+                                    video_element = page.locator("a").first
+                                else:
+                                    video_element = find_element(page, target_video)
+
+                            if video_element:
+                                try:
+                                    video_element.scroll_into_view_if_needed()
+                                    video_element.hover() # Helping UI wake up
+                                    time.sleep(0.5)
+                                    video_element.click(force=True)
+                                    log("Clicked video/song successfully.")
+                                    
+                                    # Wait for player/page load
+                                    time.sleep(3)
+                                    
+                                    results.append({
+                                        "step_no": idx + 1, "action": "PLAY", "target": target_video, "status": "PASS",
+                                        "screenshot": take_screenshot(page, idx + 1, "PASS")
+                                    })
+                                    success = True
+                                    break
+                                except Exception as e:
+                                    log(f"Failed to click video element: {e}")
+                                    raise e
+                            else:
+                                raise Exception(f"Could not find video/song to play: {target_video}")
 
                         # ---------------- VERIFY ----------------
                         elif step["type"] == "verify":
